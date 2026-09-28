@@ -7,78 +7,46 @@
 
 import UIKit
 
-// ViewController manages the screen and conforms to
-// UITableViewDelegate and UITableViewDataSource protocols.
-class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+// ViewController manages the screen.
+class ViewController: UIViewController {
     
-    // Stores a reference to the currently displayed alert.
+    // Keeps a reference to the currently displayed alert.
     // We use it later to access the text entered in its text field.
     var alertController = UIAlertController()
     
-    // IBOutlet connects the UITableView from the Storyboard
+    // Connects the UITableView from the Storyboard
     // to this property so we can access it in code.
     @IBOutlet weak var tableView: UITableView!
     
-    // IBOutlet connects the "Remove All" UIBarButtonItem
-    // from the Storyboard to this property.
-    // We use it to enable/disable the button depending on whether
-    // the data array contains any items.
+    // Connects the "Remove All" UIBarButtonItem from the Storyboard.
+    // Its enabled state depends on whether the list contains any items.
     @IBOutlet weak var removeBarButtonItem: UIBarButtonItem!
     
-    // The data source for our table.
-    // The table view will display one row for each item.
+    // The source of truth for the table view's content.
+    // Each String represents one row in the list.
     var data = [String]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         // Set the ViewController as the table view's delegate.
-        // This lets us respond to user interactions and table view events.
+        // The delegate handles table view events and user interactions.
         tableView.delegate = self
         
         // Set the ViewController as the table view's data source.
-        // This tells the table view where to get its data from.
+        // The data source provides the content displayed by the table view.
         tableView.dataSource = self
         
         // Set the initial state of the "Remove All" button.
-        // The button should be disabled because the list is initially empty.
+        // The list is initially empty, so the button should be disabled.
         updateRemoveButtonState()
     }
     
-    // Tells the table view how many rows it should display.
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // The number of rows should match the number of items in our data array.
-        return data.count
-    }
-    
-    // Provides a cell for each row.
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        // ❌ Do not create a new cell for every row:
-        // let cell = UITableViewCell()
-        //
-        // Creating a new cell every time is inefficient because it creates
-        // a new object for every row instead of reusing existing cells.
-        //
-        // UITableView is designed to reuse cells that have scrolled off-screen.
-        // This is especially important when displaying a large amount of data.
-        
-        // ✅ Reuse an existing cell whenever possible.
-        // "defaultCell" must match the cell's Reuse Identifier
-        // configured in the Storyboard.
-        let cell = tableView.dequeueReusableCell(withIdentifier: "defaultCell", for: indexPath)
-        
-        // indexPath.row tells us which row is currently being requested.
-        // Use it to get the corresponding item from the data array.
-        cell.textLabel?.text = data[indexPath.row]
-        
-        // Return the configured cell to the table view.
-        return cell
-    }
     
     // Called when the "Remove All" UIBarButtonItem is tapped.
     @IBAction func didRemoveBarButtonItemTapped(_ sender: UIBarButtonItem) {
         
-        // Show a confirmation alert before deleting all items.
+        // Ask the user for confirmation before deleting all items.
         presentAlert(title: "Uyarı!",
                      message: "Listedeki bütün öğeleri silmek istediğinize emin misiniz?",
                      defaultButtonTitle: "Evet",
@@ -87,11 +55,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             // Remove all elements from the data source.
             self.data.removeAll()
             
-            // Tell the table view that its data has changed
-            // so it can update the visible rows.
+            // Refresh the table view because its data source has changed.
             self.tableView.reloadData()
             
-            // Update the "Remove All" button because the list is now empty.
+            // Update the button because the list is now empty.
             self.updateRemoveButtonState()
         }
         
@@ -103,44 +70,43 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     // Presents an alert that allows the user to enter a new item.
-    func presentAddAlert(){
-        presentAlert(title: "Yeni Eleman Ekle",
-                     message: nil,
-                     defaultButtonTitle: "Ekle",
-                     cancelButtonTitle: "Vazgeç",
-                     isTextFieldAvailable: true,
-                     defaultButtonHandler: { _ in
-            
-            // Get the text entered by the user.
-            // The optional chaining (?.) is used because the text field
-            // or its text value may be nil.
-            //
-            // trimmingCharacters removes leading/trailing whitespace
-            // and newline characters.
-            //
-            // ?? "" converts a possible nil value into an empty String.
-            let text = self.alertController.textFields?.first?.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-            
-            // Only add the item if the resulting text is not empty.
-            if !text.isEmpty {
+    func presentAddAlert() {
+        presentAlert(
+            title: "Yeni Eleman Ekle",
+            message: nil,
+            defaultButtonTitle: "Ekle",
+            cancelButtonTitle: "Vazgeç",
+            isTextFieldAvailable: true,
+            defaultButtonHandler: { _ in
                 
-                // Add the new item to the data source.
-                self.data.append(text)
+                // Get and trim the text entered by the user.
+                //
+                // Optional chaining (?.) is used because the text field
+                // or its text value may be nil.
+                //
+                // ?? "" provides an empty String when the value is nil.
+                let text = self.alertController.textFields?.first?.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
                 
-                // Refresh the table view so the newly added item appears.
-                self.tableView.reloadData()
-                
-                // Enable the "Remove All" button because the list
-                // now contains at least one item.
-                self.updateRemoveButtonState()
-                
-            } else {
-                // If the user entered an empty value,
-                // show a warning instead of adding it to the list.
-                self.presentWarningAlert()
-                
+                // Only add the item if the resulting text is not empty.
+                if !text.isEmpty {
+                    // Add the new item to the data source.
+                    self.data.append(text)
+                    
+                    // Refresh the table view so the new item appears.
+                    self.tableView.reloadData()
+                    
+                    // Enable the "Remove All" button because
+                    // the list now contains at least one item.
+                    self.updateRemoveButtonState()
+                } else {
+                    
+                    // Do not add empty items.
+                    // Show a warning instead.
+                    self.presentWarningAlert()
+                    
+                }
             }
-        })
+        )
     }
     
     // Shows a warning alert when the user tries to add an empty item.
@@ -150,55 +116,67 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                      cancelButtonTitle: "Tamam")
     }
     
-    // A reusable helper method for creating and presenting UIAlertControllers.
-    // This prevents us from repeating the same alert creation code
-    // in different places.
-    func presentAlert(title: String?,
-                      message: String?,
-                      preferredStyle: UIAlertController.Style = .alert,
-                      defaultButtonTitle: String? = nil,
-                      cancelButtonTitle: String?,
-                      isTextFieldAvailable: Bool = false,
-                      defaultButtonHandler: ((UIAlertAction) -> Void)? = nil
-    ){
-        
-        // Create a new UIAlertController with the provided configuration.
-        alertController = UIAlertController(title: title,
-                                            message: message,
-                                            preferredStyle: preferredStyle)
-        
-        // Add the default/action button only if a title was provided.
+    // A reusable helper for creating and presenting alerts.
+    // This keeps the alert creation logic in one place.
+    func presentAlert(
+        title: String?,
+        message: String?,
+        preferredStyle: UIAlertController.Style = .alert,
+        defaultButtonTitle: String? = nil,
+        cancelButtonTitle: String?,
+        isTextFieldAvailable: Bool = false,
+        textFieldInitialValue: String? = nil,
+        defaultButtonHandler: ((UIAlertAction) -> Void)? = nil
+    ) {
+
+        // Create a new alert controller with the provided configuration.
+        alertController = UIAlertController(
+            title: title,
+            message: message,
+            preferredStyle: preferredStyle
+        )
+
+        // Add the primary action only when a title is provided.
         if defaultButtonTitle != nil {
+
+            // The handler is executed when the user taps the action.
+            let defaultButton = UIAlertAction(
+                title: defaultButtonTitle,
+                style: .default,
+                handler: defaultButtonHandler
+            )
             
-            // Create the action and assign the provided handler.
-            // The handler is executed when the user taps this button.
-            let defaultButton = UIAlertAction(title: defaultButtonTitle,
-                                              style: .default,
-                                              handler: defaultButtonHandler)
             alertController.addAction(defaultButton)
         }
-        
-        // Create a cancel button.
-        let cancelButton = UIAlertAction(title: cancelButtonTitle,
-                                         style: .cancel)
-        
-        
-        // Add a text field only when the caller requests one.
+
+        // Create the cancel action.
+        let cancelButton = UIAlertAction(
+            title: cancelButtonTitle,
+            style: .cancel
+        )
+
+        // Add a text field only when requested by the caller.
         if isTextFieldAvailable {
-            alertController.addTextField()
+
+            // Configure the text field when it is created.
+            // textFieldInitialValue allows the caller to provide
+            // an initial value, which is useful when editing an item.
+            alertController.addTextField { textField in
+                textField.text = textFieldInitialValue
+            }
         }
-        
-        // Add the cancel button to the alert.
+
+        // Add the cancel action to the alert.
         alertController.addAction(cancelButton)
-        
-        // Present the alert controller on the screen.
+
+        // Present the configured alert on the screen.
         present(alertController, animated: true)
     }
-    
     
     // Updates the enabled/disabled state of the "Remove All" button
     // according to whether the data array contains any items.
     func updateRemoveButtonState() {
+        
         // isEnabled expects a Boolean value.
         //
         // data.isEmpty == true  → !true  == false → button disabled
@@ -207,3 +185,123 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
 }
 
+// MARK: - UITableViewDelegate & UITableViewDataSource
+// Keeps the table view-related methods separate from the main
+// ViewController implementation.
+extension ViewController: UITableViewDelegate, UITableViewDataSource {
+
+    // Tells the table view how many rows it should display.
+    func tableView(
+        _ tableView: UITableView,
+        numberOfRowsInSection section: Int
+    ) -> Int {
+
+        // The number of rows must match the number of items
+        // available in the data source.
+        return data.count
+    }
+
+    // Provides and configures the cell for a specific row.
+    func tableView(
+        _ tableView: UITableView,
+        cellForRowAt indexPath: IndexPath
+    ) -> UITableViewCell {
+
+        // UITableView reuses cells instead of creating a new cell
+        // for every row. This improves memory usage and performance.
+        //
+        // "defaultCell" must match the cell's Reuse Identifier
+        // configured in the Storyboard.
+        let cell = tableView.dequeueReusableCell(
+            withIdentifier: "defaultCell",
+            for: indexPath
+        )
+
+        // indexPath.row identifies the current row.
+        // Use it to retrieve the corresponding item from the data array.
+        cell.textLabel?.text = data[indexPath.row]
+
+        // Return the configured reusable cell to the table view.
+        return cell
+
+    }
+
+    
+    // Provides swipe actions for each table view row.
+    // These actions allow the user to delete or edit an item.
+    func tableView(
+        _ tableView: UITableView,
+        trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+    ) -> UISwipeActionsConfiguration? {
+
+        // MARK: Delete
+        // Create the delete swipe action.
+
+        let deleteAction = UIContextualAction(
+            style: .normal,
+            title: "Sil"
+        ) { _, _, _ in
+
+            // Remove the item at the selected row from the data source.
+            self.data.remove(at: indexPath.row)
+
+            // Refresh the table view after modifying the data source.
+            tableView.reloadData()
+
+            // Disable the "Remove All" button if the list became empty.
+            self.updateRemoveButtonState()
+        }
+
+        // Give the delete action a system red background.
+        deleteAction.backgroundColor = .systemRed
+
+        // MARK: Edit
+        // Create the edit swipe action.
+        let editAction = UIContextualAction(
+            style: .normal,
+            title: "Düzenle"
+        ) { _, _, _ in
+
+            // Show the edit alert and pre-fill the text field
+            // with the current value of the selected item.
+            self.presentAlert(
+                title: "Elemanı Düzenle",
+                message: nil,
+                defaultButtonTitle: "Düzenle",
+                cancelButtonTitle: "Vazgeç",
+                isTextFieldAvailable: true,
+                textFieldInitialValue: self.data[indexPath.row],
+                defaultButtonHandler: { _ in
+
+                    // Get and trim the edited text.
+                    // ?? "" converts a possible nil value into
+                    // an empty String.
+                    let text = self.alertController.textFields?.first?.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+                    // Only update the item if the new value is not empty.
+                    if !text.isEmpty {
+
+                        // Replace the old value at the selected index.
+                        self.data[indexPath.row] = text
+                        
+                        // Refresh the table view to display the updated value.
+                        self.tableView.reloadData()
+                        
+                    } else {
+
+                        // Do not replace the existing value with an empty string.
+                        self.presentWarningAlert()
+                    }
+                }
+            )
+        }
+
+        // Combine the available swipe actions into one configuration.
+        let config = UISwipeActionsConfiguration(
+            actions: [deleteAction, editAction]
+        )
+        
+        // Return the configuration to the table view.
+        return config
+    }
+}
