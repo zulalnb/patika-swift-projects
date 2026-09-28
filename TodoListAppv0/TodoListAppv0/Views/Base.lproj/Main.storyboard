@@ -28,7 +28,6 @@
                                             <rect key="frame" x="0.0" y="0.0" width="440" height="51"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
-                                        <color key="backgroundColor" systemColor="systemYellowColor"/>
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
@@ -36,8 +35,29 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Todo List App" id="IaX-UU-RdG"/>
+                    <toolbarItems>
+                        <barButtonItem systemItem="trash" id="gB8-fm-Wzd">
+                            <color key="tintColor" systemColor="systemRedColor"/>
+                            <connections>
+                                <action selector="didRemoveBarButtonItemTapped:" destination="BYZ-38-t0r" id="TY5-gy-Nzu"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem systemItem="add" id="LH8-Bu-8ol">
+                            <color key="tintColor" systemColor="linkColor"/>
+                            <connections>
+                                <action selector="didAddBarButtonItemTapped:" destination="BYZ-38-t0r" id="QkJ-DI-hxz"/>
+                            </connections>
+                        </barButtonItem>
+                    </toolbarItems>
+                    <navigationItem key="navigationItem" title="Todo List App" id="IaX-UU-RdG">
+                        <connections>
+                            <outlet property="leftBarButtonItem" destination="gB8-fm-Wzd" id="zF2-Rp-P69"/>
+                            <outlet property="rightBarButtonItem" destination="LH8-Bu-8ol" id="Dj3-Wq-cG5"/>
+                        </connections>
+                    </navigationItem>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="removeBarButtonItem" destination="gB8-fm-Wzd" id="GoU-iZ-ZPR"/>
                         <outlet property="tableView" destination="W6t-GV-PGg" id="0De-yc-9jE"/>
                     </connections>
                 </viewController>
@@ -65,11 +85,14 @@
         </scene>
     </scenes>
     <resources>
+        <systemColor name="linkColor">
+            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
-        <systemColor name="systemYellowColor">
-            <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <systemColor name="systemRedColor">
+            <color red="1" green="0.21960784310000001" blue="0.23529411759999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
