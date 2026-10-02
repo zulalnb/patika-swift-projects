@@ -343,7 +343,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
                     if !text.isEmpty {
                         
                         // Update the "title" attribute of the managed object.
-                        self.data[indexPath.row].setValue(text, forKey: "title")
+                        listItem.setValue(text, forKey: "title")
                         
                         // Check whether the context contains unsaved changes.
                         if managedObjectContext!.hasChanges {
