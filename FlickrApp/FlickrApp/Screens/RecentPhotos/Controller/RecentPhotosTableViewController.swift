@@ -45,13 +45,13 @@ class RecentPhotosTableViewController: UITableViewController, UISearchResultsUpd
         ]
         
         if let search = search {
-                components.queryItems?.append(
-                    URLQueryItem(name: "q", value: search)
-                )
-            }
+            components.queryItems?.append(
+                URLQueryItem(name: "q", value: search)
+            )
+        }
         
         guard let url = components.url else { return }
-
+        
         let request = URLRequest(url: url)
         
         URLSession.shared.dataTask(with: request) { data, response, error in
@@ -61,8 +61,8 @@ class RecentPhotosTableViewController: UITableViewController, UISearchResultsUpd
             }
             if let data = data, let response = try? JSONDecoder().decode(PhotosResponse.self, from: data) {
                 DispatchQueue.main.async {
-                        self.response = response
-                    }
+                    self.response = response
+                }
             }
         }.resume()
     }
@@ -73,28 +73,44 @@ class RecentPhotosTableViewController: UITableViewController, UISearchResultsUpd
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return response?.hits.count ?? .zero
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let photo = response?.hits[indexPath.row]
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! PhotoTableViewCell
-        cell.ownerImageView.backgroundColor = .darkGray
-        cell.ownerNameLabel.text = "Owner Name"
-        cell.photoImageView.backgroundColor = .gray
-        cell.titleLabel.text = "Title Label"
+        
+        NetworkManager.shared.fetchImage(with: photo?.avatarURL) { data in
+            DispatchQueue.main.async {
+                cell.ownerImageView.image = UIImage(data: data)
+            }
+        }
+        
+        cell.ownerNameLabel.text = photo?.user
+        
+        NetworkManager.shared.fetchImage(with: photo?.webformatURL) { data in
+            DispatchQueue.main.async {
+                cell.photoImageView.image = UIImage(data: data)
+            }
+        }
+        
+        cell.titleLabel.text = photo?.name
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        performSegue(withIdentifier: "detailSegue", sender: nil)
+        let photo = response?.hits[indexPath.row]
+        performSegue(withIdentifier: "detailSegue", sender: photo?.id)
     }
     
     // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
-        if let viewController = segue.destination as? PhotoDetailViewController {
-            // TODO: Pass the selected photo to detail screen
+        if let viewController = segue.destination as? PhotoDetailViewController,
+           let photoID = sender as? Int {
+            viewController.photoID = photoID
         }
     }
     
