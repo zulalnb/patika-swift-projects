@@ -9,9 +9,20 @@ import UIKit
 
 class RecentPhotosTableViewController: UITableViewController, UISearchResultsUpdating {
     
+    private var response: PhotosResponse? {
+        didSet {
+            tableView.reloadData()
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupSearchController()
+        fetchRecentPhotos()
+        
+    }
+    
+    private func setupSearchController(){
         let search = UISearchController(searchResultsController: nil)
         search.searchResultsUpdater = self
         search.obscuresBackgroundDuringPresentation = false
@@ -21,7 +32,41 @@ class RecentPhotosTableViewController: UITableViewController, UISearchResultsUpd
             navigationItem.preferredSearchBarPlacement = .stacked
         }
     }
+    
+    private func fetchRecentPhotos(with search: String? = nil){
+        guard let apiKey = ProcessInfo.processInfo.environment["API_KEY"] else { fatalError("API_KEY is missing") }
+        
+        var components = URLComponents(string: "https://pixabay.com/api")!
+        
+        components.queryItems = [
+            URLQueryItem(name: "key", value: apiKey),
+            URLQueryItem(name: "order", value: "latest"),
+            URLQueryItem(name: "image_type", value: "photo")
+        ]
+        
+        if let search = search {
+                components.queryItems?.append(
+                    URLQueryItem(name: "q", value: search)
+                )
+            }
+        
+        guard let url = components.url else { return }
 
+        let request = URLRequest(url: url)
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                debugPrint(error)
+                return
+            }
+            if let data = data, let response = try? JSONDecoder().decode(PhotosResponse.self, from: data) {
+                DispatchQueue.main.async {
+                        self.response = response
+                    }
+            }
+        }.resume()
+    }
+    
     // MARK: - UITableViewDataSource & UITableViewDelegate
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -41,9 +86,9 @@ class RecentPhotosTableViewController: UITableViewController, UISearchResultsUpd
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-       performSegue(withIdentifier: "detailSegue", sender: nil)
+        performSegue(withIdentifier: "detailSegue", sender: nil)
     }
-  
+    
     // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
@@ -55,9 +100,9 @@ class RecentPhotosTableViewController: UITableViewController, UISearchResultsUpd
     
     // MARK: - UISearchResultsUpdating
     func updateSearchResults(for searchController: UISearchController) {
-        guard let text = searchController.searchBar.text else { return }
+        guard let text = searchController.searchBar.text?.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
         if text.count > 2 {
-            print(text)
+            fetchRecentPhotos(with: text)
         }
     }
 }
