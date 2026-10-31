@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="25098" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="lPU-I1-04m">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="25408" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="lPU-I1-04m">
     <device id="retina6_9" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="25073"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="25407"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Todo List App-->
+        <!--Todo List-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="TodoListApp" customModuleProvider="target" sceneMemberID="viewController">
@@ -49,7 +49,7 @@
                             </connections>
                         </barButtonItem>
                     </toolbarItems>
-                    <navigationItem key="navigationItem" title="Todo List App" id="IaX-UU-RdG">
+                    <navigationItem key="navigationItem" title="Todo List" id="IaX-UU-RdG">
                         <connections>
                             <outlet property="leftBarButtonItem" destination="gB8-fm-Wzd" id="zF2-Rp-P69"/>
                             <outlet property="rightBarButtonItem" destination="LH8-Bu-8ol" id="Dj3-Wq-cG5"/>
@@ -71,7 +71,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="lPU-I1-04m" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="VYF-we-kG3">
-                        <rect key="frame" x="0.0" y="124" width="440" height="54"/>
+                        <rect key="frame" x="0.0" y="62" width="440" height="54"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
