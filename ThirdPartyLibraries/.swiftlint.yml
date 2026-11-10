@@ -1,0 +1,83 @@
+# MARK: - Disabled Rules
+
+disabled_rules:
+  - colon
+  - comma
+  - control_statement
+
+
+# MARK: - Opt-in Rules
+
+opt_in_rules:
+  - empty_count
+  - empty_string
+  - force_unwrapping
+  - implicitly_unwrapped_optional
+  - redundant_nil_coalescing
+
+
+# MARK: - Included / Excluded Paths
+
+included:
+  - AdvancedSwift
+
+excluded:
+  - Pods
+  - Carthage
+  - .build
+  - DerivedData
+  - build
+  - Packages
+
+
+# MARK: - Behavior
+
+allow_zero_lintable_files: false
+
+strict: false
+lenient: false
+
+
+# MARK: - Rule Configuration
+
+line_length:
+  warning: 150
+  error: 160
+  
+trailing_whitespace:
+  ignores_empty_lines: true
+
+force_cast: warning
+
+force_try: warning
+
+type_body_length:
+  warning: 300
+  error: 400
+
+file_length:
+  warning: 500
+  error: 1200
+
+
+# MARK: - Naming
+
+type_name:
+  min_length: 3
+  max_length:
+    warning: 40
+    error: 50
+
+identifier_name:
+  min_length:
+    warning: 2
+    error: 1
+  excluded:
+    - id
+    - url
+    - URL
+
+
+# MARK: - Reporter
+
+reporter: xcode

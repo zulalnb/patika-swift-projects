@@ -1,5 +1,18 @@
-.DS_Store
+# Swift Package Manager
+.build/
+Packages/
+
+# Xcode
 DerivedData/
 build/
-xcuserdata/
 *.xcuserstate
+xcuserdata/
+
+# CocoaPods (if used)
+Pods/
+
+# Carthage (if used)
+Carthage/Build/
+
+# macOS
+.DS_Store
